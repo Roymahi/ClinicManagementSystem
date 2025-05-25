@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPdate Patient - Clinic</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0;">
+
+    <!-- Sidebar -->
+    <div class="sidebar" style="width: 200px; height: 100vh; background-color: #2c3e50; color: white; float: left; padding: 20px 10px;">
+        <img src="/static/images/logo.png" alt="Logo" style="width: 100%; margin-bottom: 30px;">
+        <ul style="list-style-type: none; padding: 0;">
+            <li style="padding: 10px 0;"><a href="/dashboard" style="color: white; text-decoration: none;">Dashboard</a></li>
+            <li style="padding: 10px 0;"><a href="/add_patient" style="color: white; text-decoration: none;">Add Patient</a></li>
+            <li style="padding: 10px 0;"><a href="/add_doctor" style="color: white; text-decoration: none;">Add Doctor</a></li>
+            <li style="padding: 10px 0;"><a href="/add_appointment" style="color: white; text-decoration: none;">Add Appointment</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-block" style="margin-left: 220px; padding: 40px;">
+        <div class="header" style="display: flex; align-items: center; justify-content: space-between;">
+         
+            <img src="/static/images/receptionist.png" style="width: 50px; height: 50px; border-radius: 50%;">
+        </div>
+
+        <h2 style="margin-top: 30px;">Update New Patient</h2>
+        
+        <form method="POST" style="margin-top: 20px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 600px;">
+            <!-- Patient Name -->
+            <label style="display: block; margin-bottom: 10px;">Name</label>
+            <input type="text" name="Patient-Name" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc;">
+
+            <!-- Patient Age -->
+            <label style="display: block; margin-bottom: 10px;">Age</label>
+            <input type="number" name="Patient-Age" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc;">
+
+  
+            <label style="display: block; margin-bottom: 10px;">Gender</label>
+            <select name="Gender" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc;">
+                 <option value="Male">Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+
+
+            <label style="display: block; margin-bottom: 10px;">Phone No.</label>
+            <input type="text" name="Patient-PhoneNo" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc;">
+
+
+            <label style="display: block; margin-bottom: 10px;">Disease</label>
+            <textarea name="Patient-desc" cols="30" rows="5" required style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc;"></textarea>
+
+            <button type="submit" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">Save Changes</button>
+            <a href= "/dashboard" style="margin-left: 15px; color:#2c3e50; text-decoration: none;">Cancle</a>
+        </form>
+    </div>
+
+</body>
+</html>

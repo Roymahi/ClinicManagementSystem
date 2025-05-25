@@ -1,0 +1,105 @@
+body{
+    margin:  0;
+    font-family: Arial, sans-serif;
+
+}
+
+.login-body{
+    background:  linear-gradient(to right,#8360c3,#2ebf91);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.login-wrapper{
+    background:white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 300px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 3.1);
+
+}
+
+.login-wrapper h2{
+    text-align: center;
+}
+
+.login-wrapper input{
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0 ;
+    border:  1px solid #ddd;
+    border-radius:  5px;
+}
+.login-wrapper button{
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(to right,#00c6ff,#0072ff);
+    border: none;
+    color: white;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+
+.dashboard-body
+{
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar{
+    width: 250px;
+    background-color: #2f3542;
+    color: white;
+    padding: 20px;
+
+}
+.sidebar .dashboard-logo{
+
+    width: 100%;
+    margin-bottom: 20px;
+    background-color: #ddd;
+
+}
+.sidebar ul{
+    list-style: none;
+    padding: 0;
+}
+.sidebar ul li{
+    margin:  15px 0 ;
+    cursor: pointer;
+}
+
+.main-block
+{
+    flex-grow:  1;
+    padding: 20px;
+    background: #f1f2f6;
+}
+
+.header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.profile-receptionist{
+    width: 80px;
+    height: 70px;
+    border-radius: 50%;
+
+}
+
+.cards{
+    display: flex;
+    gap: 20px ;
+    margin-top: 20px;
+}
+.card{
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    flex: 1;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}

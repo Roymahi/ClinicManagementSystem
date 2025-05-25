@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Patient - Clinic</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0;">
+
+    <!-- Sidebar -->
+    <div class="sidebar" style="width: 200px; height: 100vh; background-color: #2c3e50; color: white; float: left; padding: 20px 10px;">
+        <img src="/static/images/logo.png" alt="Logo" style="width: 100%; margin-bottom: 30px;">
+        <ul style="list-style-type: none; padding: 0;">
+            <li style="padding: 10px 0;"><a href="/dashboard" style="color: white; text-decoration: none;">Dashboard</a></li>
+            <li style="padding: 10px 0;"><a href="/add_patient" style="color: white; text-decoration: none;">Add Patient</a></li>
+            <li style="padding: 10px 0;"><a href="/add_doctor" style="color: white; text-decoration: none;">Add Doctor</a></li>
+            <li style="padding: 10px 0;"><a href="/add_appointment" style="color: white; text-decoration: none;">Add Appointment</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-block" style="margin-left: 220px; padding: 40px;">
+        <div class="header" style="display: flex; align-items: center; justify-content: space-between;">
+            <h2>Welcome to Health Clinic</h2>
+            <img src="/static/images/receptionist.png" style="width: 50px; height: 50px; border-radius: 50%;">
+        </div>
+
+
+
+    <h2>Patients details fopr {{selected_date}}</h2>
+
+    {% if patients %}
+        {% for  patient in patients %}
+        <div style=" border: 2px solid black; border-radius: 10px; padding: 10px; margin: 10px;">
+            <strong>{{Patient.name}}</strong>
+             <p><strong>Date:</strong> {{patient.date}} </p>
+            <p><strong>Age:</strong> {{patient.age}} </p>
+             <p><strong>Gender:</strong> {{patient.gender}} </p>
+              <p><strong>Phone:</strong> {{patient.phone}} </p>
+               <p><strong>Disease:</strong> {{patient.disease}} </p>
+
+
+        </div>
+        {%endfor%}
+    {% else %}
+    <p><strong>Patient details Not Found </details></strong></p>
+
+
+    
+
+    </div>
+
+</body>
+</html>
