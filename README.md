@@ -39,6 +39,9 @@ A web-based Clinic Management System built with Flask and SQLAlchemy to manage p
    ```
 
 Contact
-Contributors: Mahi Roy & Rohit Kumar
+Contributors: Mahi Roy
+GitHub: https://github.com/Roymahi
+Email: snortsniper16@gmail.com
+Contributor: Rohit Kumar
 GitHub: https://github.com/rkstm7
-Email: your.email@example.com
+Email: rkstm9@gmail.com
