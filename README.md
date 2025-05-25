@@ -1,4 +1,6 @@
 # ClinicManagementSystem# Clinic Management System
+![Clinic Dashboard](https://github.com/Roymahi/ClinicManagementSystem/blob/main/assets/dashboard.png?raw=true)
+
 
 A web-based Clinic Management System built with Flask and SQLAlchemy to manage patients, doctors, appointments, and visits efficiently.
 
