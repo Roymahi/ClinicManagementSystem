@@ -1,4 +1,4 @@
-# ClinicManagementSystem# Clinic Management System
+# ClinicManagementSystem
 ![Clinic Dashboard](dashboard.png)
 
 
