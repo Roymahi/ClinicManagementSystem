@@ -3,9 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Add Patient - Clinic</title>
-
-    <!-- Bootstrap CSS -->
+    <title>Add Patient - Clinic Management System</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -141,6 +139,42 @@
               name="Patient-Email"
               class="form-control"
               required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="patientGender" class="form-label">Gender</label>
+            <select
+              id="patientGender"
+              name="Patient-Gender"
+              class="form-select"
+              required
+            >
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="patientDesc" class="form-label">Disease/Description</label>
+            <textarea
+              id="patientDesc"
+              name="Patient-desc"
+              class="form-control"
+              rows="3"
+              required
+            ></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label for="registrationDate" class="form-label">Registration Date</label>
+            <input
+              type="date"
+              id="registrationDate"
+              name="date"
+              class="form-control"
             />
           </div>
 
