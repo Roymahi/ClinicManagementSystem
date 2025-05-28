@@ -1,20 +1,53 @@
 from flask import flash
-from flask import Flask, render_template, redirect, url_for, flash, request
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, flash, request, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy import func
+import re
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///clinic.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# For production, enable CSRF protection (e.g., Flask-WTF)
+app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'  # Added for session management
 
 db = SQLAlchemy(app)
 
 def utc_today():
     return datetime.utcnow().date()
+
+# Input validation functions
+def validate_name(name):
+    if not name or len(name.strip()) < 2:
+        return False
+    return re.match(r'^[a-zA-Z\s]+$', name.strip())
+
+def validate_phone(phone):
+    if not phone:
+        return False
+    # Remove spaces and check if it's 10 digits
+    clean_phone = re.sub(r'\s+', '', phone)
+    return re.match(r'^\d{10}$', clean_phone)
+
+def validate_email(email):
+    if not email:
+        return True  # Email is optional
+    return re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email)
+
+def validate_age(age_str):
+    try:
+        age = int(age_str)
+        return 0 < age <= 120
+    except (ValueError, TypeError):
+        return False
+
+def login_required(f):
+    def decorated_function(*args, **kwargs):
+        if 'logged_in' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    decorated_function.__name__ = f.__name__
+    return decorated_function
 
 # Patient Model
 class Patient(db.Model):
@@ -76,15 +109,28 @@ def home():
 def login():
     error = None
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        if username == USERNAME and password == PASSWORD:
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        
+        if not username or not password:
+            error = 'Please enter both username and password'
+        elif username == USERNAME and password == PASSWORD:
+            session['logged_in'] = True
+            session['username'] = username
+            flash('Login successful!', 'success')
             return redirect(url_for('dashboard'))
         else:
             error = 'Invalid credentials'
     return render_template('login.html', error=error)
 
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('You have been logged out successfully.', 'info')
+    return redirect(url_for('login'))
+
 @app.route('/dashboard')
+@login_required
 def dashboard():
     total_patients = Patient.query.count()
     total_appointments = Appointment.query.count()
@@ -106,6 +152,7 @@ def dashboard():
                            selected_date=None)
     
 @app.route('/visit/delete/<int:appointment_id>', methods=['POST'])
+@login_required
 def delete_visit(appointment_id):
     appointment = Appointment.query.get_or_404(appointment_id)
     db.session.delete(appointment)
@@ -115,17 +162,36 @@ def delete_visit(appointment_id):
     
 
 @app.route('/add_patient', methods=['GET', 'POST'])
+@login_required
 def add_patient():
     if request.method == 'POST':
-        name = request.form.get('Patient-Name')
-        age_str = request.form.get('Patient-Age')
-        gender = request.form.get('Gender')
-        phone = request.form.get('Patient-PhoneNo')
-        desc = request.form.get('Patient-desc')
-        date_str = request.form.get('date')
+        name = request.form.get('Patient-Name', '').strip()
+        age_str = request.form.get('Patient-Age', '').strip()
+        gender = request.form.get('Gender', '').strip()
+        phone = request.form.get('Patient-PhoneNo', '').strip()
+        desc = request.form.get('Patient-desc', '').strip()
+        date_str = request.form.get('date', '').strip()
+
+        # Validation
+        errors = []
+        if not validate_name(name):
+            errors.append('Please enter a valid name (letters only)')
+        if not validate_age(age_str):
+            errors.append('Please enter a valid age (1-120)')
+        if gender not in ['Male', 'Female', 'Other']:
+            errors.append('Please select a valid gender')
+        if not validate_phone(phone):
+            errors.append('Please enter a valid 10-digit phone number')
+        if not desc:
+            errors.append('Please enter patient description/disease')
+
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return render_template('add_patient.html')
 
         try:
-            age = int(age_str) if age_str else None
+            age = int(age_str)
         except ValueError:
             age = None
 
@@ -138,18 +204,37 @@ def add_patient():
         db.session.add(new_patient)
         db.session.commit()
 
-        print(f"Patient Added: {name}, {age}, {phone}")
+        flash(f"Patient {name} added successfully!", 'success')
         return redirect(url_for('dashboard'))
     return render_template('add_patient.html')
 
 @app.route('/add_doctor', methods=['GET', 'POST'])
+@login_required
 def add_doctor():
     if request.method == 'POST':
-        name = request.form.get('Doctor-Name')
-        specialization = request.form.get('Doctor-Specialization')
-        phone = request.form.get('Doctor-Phone')
-        email = request.form.get('Doctor-Email')
-        experience_str = request.form.get('Doctor-Experience')
+        name = request.form.get('Doctor-Name', '').strip()
+        specialization = request.form.get('Doctor-Specialization', '').strip()
+        phone = request.form.get('Doctor-Phone', '').strip()
+        email = request.form.get('Doctor-Email', '').strip()
+        experience_str = request.form.get('Doctor-Experience', '').strip()
+
+        # Validation
+        errors = []
+        if not validate_name(name):
+            errors.append('Please enter a valid doctor name')
+        if not specialization:
+            errors.append('Please enter specialization')
+        if not validate_phone(phone):
+            errors.append('Please enter a valid 10-digit phone number')
+        if not validate_email(email):
+            errors.append('Please enter a valid email address')
+        if experience_str and not experience_str.isdigit():
+            errors.append('Please enter valid experience in years')
+
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return render_template('add_doctor.html')
 
         try:
             experience = int(experience_str) if experience_str else None
@@ -160,24 +245,50 @@ def add_doctor():
         db.session.add(new_doctor)
         db.session.commit()
 
-        print(f"Doctor Added: {name}, {specialization}, {phone}")
+        flash(f"Doctor {name} added successfully!", 'success')
         return redirect(url_for('dashboard'))
     return render_template('add_doctor.html')
 
 @app.route('/add_appointment', methods=['GET', 'POST'])
+@login_required
 def add_appointment():
+    doctors = Doctor.query.all()
+    patients = Patient.query.all()
+    
     if request.method == 'POST':
-        patient_name = request.form.get('Patient-Name')
-        doctor_name = request.form.get('Doctor-Name')
-        date_str = request.form.get('Appointment-Date')
-        time = request.form.get('Appointment-Time')
-        reason = request.form.get('Reason')
-        status = request.form.get('Status') or 'scheduled'
+        patient_name = request.form.get('Patient-Name', '').strip()
+        doctor_name = request.form.get('Doctor-Name', '').strip()
+        date_str = request.form.get('Appointment-Date', '').strip()
+        time = request.form.get('Appointment-Time', '').strip()
+        reason = request.form.get('Reason', '').strip()
+        status = request.form.get('Status', 'scheduled').strip()
+
+        # Validation
+        errors = []
+        if not patient_name:
+            errors.append('Please enter patient name')
+        if not doctor_name:
+            errors.append('Please enter doctor name')
+        if not date_str:
+            errors.append('Please select appointment date')
+        if not time:
+            errors.append('Please enter appointment time')
+        if not reason:
+            errors.append('Please enter reason for appointment')
+
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return render_template('add_appointment.html', doctors=doctors, patients=patients)
 
         try:
-            appointment_date = datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else utc_today()
+            appointment_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            if appointment_date < datetime.now().date():
+                flash('Appointment date cannot be in the past', 'error')
+                return render_template('add_appointment.html', doctors=doctors, patients=patients)
         except ValueError:
-            appointment_date = utc_today()
+            flash('Please enter a valid date', 'error')
+            return render_template('add_appointment.html', doctors=doctors, patients=patients)
 
         new_appointment = Appointment(
             patient_name=patient_name,
@@ -190,11 +301,12 @@ def add_appointment():
         db.session.add(new_appointment)
         db.session.commit()
 
-        print(f"Appointment Added: {patient_name} with {doctor_name} on {appointment_date} at {time}")
+        flash(f"Appointment scheduled for {patient_name} with Dr. {doctor_name}", 'success')
         return redirect(url_for('dashboard'))
-    return render_template('add_appointment.html')
+    return render_template('add_appointment.html', doctors=doctors, patients=patients)
 
 @app.route('/update_patient/<int:patient_id>', methods=['GET', 'POST'])
+@login_required
 def update_patient(patient_id):
     patient = Patient.query.get_or_404(patient_id)
     if request.method == 'POST':
@@ -212,6 +324,7 @@ def update_patient(patient_id):
     return render_template('update_patient.html', patient=patient)
 
 @app.route('/delete_patient/<int:patient_id>', methods=['POST'])
+@login_required
 def delete_patient(patient_id):
     patient = Patient.query.get_or_404(patient_id)
     db.session.delete(patient)
@@ -229,12 +342,14 @@ def get_patients_by_date(selected_date):
     return Patient.query.all()
 
 @app.route('/patients_by_date')
+@login_required
 def patients_by_date():
     selected_date = request.args.get('date')
     patients = get_patients_by_date(selected_date)
     return render_template('patients_by_date.html', patients=patients, selected_date=selected_date)
 
 @app.route('/update_visit/<int:appointment_id>', methods=['GET', 'POST'])
+@login_required
 def update_visit(appointment_id):
     appointment = Appointment.query.get_or_404(appointment_id)
     if request.method == 'POST':
@@ -255,11 +370,13 @@ def update_visit(appointment_id):
     return render_template('update_visit.html', appointment=appointment)
 
 @app.route('/total_visit')
+@login_required
 def total_visit():
     completed_visits = Appointment.query.filter_by(status='completed').count()
     return render_template('total_visit.html', completed_visits=completed_visits)
 
 @app.route('/mark_visit_completed/<int:appointment_id>', methods=['POST'])
+@login_required
 def mark_visit_completed(appointment_id):
     appointment = Appointment.query.get_or_404(appointment_id)
     appointment.status = 'completed'
